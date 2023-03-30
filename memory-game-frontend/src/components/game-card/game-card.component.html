@@ -1,0 +1,8 @@
+<mat-card class="custom-card">
+  <mat-card-header><b>Benvenuto su Memory: The Game!</b></mat-card-header>
+  <mat-card-content>Per iniziare, inserisci il tuo username!</mat-card-content>
+  <mat-card-actions>
+    <input type="text" [(ngModel)]="this.username">
+    <app-click-button [username]="this.username"></app-click-button>
+  </mat-card-actions>
+</mat-card>
