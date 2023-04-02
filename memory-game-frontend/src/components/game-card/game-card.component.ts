@@ -14,6 +14,7 @@ function sleep(ms: number) {
 })
 export class GameCardComponent {
     @Output() username: string = 'test';
+    @Output() buttonDisabled: boolean = false;
     @Output() closeGame: Subject<boolean> = new Subject<boolean>()
     @Input() rankings: IRankingsResult[] = [];
     @Input() timer: number = 0;
@@ -43,12 +44,14 @@ export class GameCardComponent {
     async setCountdown() {
       this.countdownStarted = true;
       this.gameStarted = true;
+      this.buttonDisabled = true;
 
       for(let i = 0; i < 3; i++) {
         await sleep(1000);
         this.countdown--;
       }
 
+      this.buttonDisabled = false;
       this.countdownStarted = false;
     }
 }

@@ -30,6 +30,7 @@ export class ClickButtonComponent implements OnInit {
   @Output() countdownStarted = new EventEmitter<boolean>();
   private userId: string = '';
   private matchId: string = '';
+  @Input() buttonDisabled = false;
 
   constructor(private userService: UserService, private matchService: MatchService, private rankingsService: RankingsService) {
     this.statusString = STATUS_STRINGS[0];
@@ -48,6 +49,7 @@ export class ClickButtonComponent implements OnInit {
         this.userService.createUser(this.username).subscribe((data: {_id: string}) => {
           this.userId = data._id;
 
+          this.buttonDisabled = true;
           this.countdownStarted.emit(true); // starts on the countdown
 
           this.matchService.createMatch(this.userId).subscribe((data: {_id: string, user: string, closed: boolean, createdAt: string}) => {
