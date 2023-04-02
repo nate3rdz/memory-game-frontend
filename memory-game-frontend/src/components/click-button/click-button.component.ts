@@ -4,6 +4,7 @@ import {MatchService} from "../../services/match.service";
 import IRankingsResult from "../../interfaces/IRankingsResult";
 import {RankingsService} from "../../services/rankings.service";
 import {Subject} from "rxjs";
+import env from "../../env";
 
 enum STATUS_STRINGS {
   'Registrati e inizia!',
@@ -58,7 +59,7 @@ export class ClickButtonComponent implements OnInit {
             this.status = 1;
             this.statusString = STATUS_STRINGS[1];
 
-            this.timer.emit(30); // starts the timer
+            this.timer.emit(env.MAX_MATCH_TIME); // starts the timer
           });
         });
         break;

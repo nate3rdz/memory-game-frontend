@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {ClickButtonComponent} from "../click-button/click-button.component";
 import IRankingsResult from "../../interfaces/IRankingsResult";
 import {Subject} from "rxjs";
+import env from "../../env";
 
 function sleep(ms: number) {
   return new Promise( resolve => setTimeout(resolve, ms) );
@@ -19,7 +20,7 @@ export class GameCardComponent {
     @Input() rankings: IRankingsResult[] = [];
     @Input() timer: number = 0;
     countdownStarted: boolean = false;
-    countdown: number = 3;
+    countdown: number = env.COUNTDOWN_STARTING_VALUE;
     gameStarted: boolean = false;
     timeFinished: boolean = false;
 
@@ -46,7 +47,7 @@ export class GameCardComponent {
       this.gameStarted = true;
       this.buttonDisabled = true;
 
-      for(let i = 0; i < 3; i++) {
+      for(let i = 0; i < env.COUNTDOWN_STARTING_VALUE; i++) {
         await sleep(1000);
         this.countdown--;
       }
