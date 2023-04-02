@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UserService} from "../../services/user.service";
 import {MatchService} from "../../services/match.service";
 import IRankingsResult from "../../interfaces/IRankingsResult";
 import {RankingsService} from "../../services/rankings.service";
+import {Subject} from "rxjs";
 
 enum STATUS_STRINGS {
   'Registrati e inizia!',
@@ -18,9 +19,10 @@ function sleep(ms: number) {
   templateUrl: './click-button.component.html',
   styleUrls: ['./click-button.component.scss']
 })
-export class ClickButtonComponent {
+export class ClickButtonComponent implements OnInit {
 
   @Input() username: string = '';
+  @Input() gameClosed: Subject<boolean> = new Subject<boolean>();
   @Output() results = new EventEmitter<IRankingsResult[]>();
   @Output() timer = new EventEmitter<number>();
   private status: number = 0;
@@ -31,6 +33,12 @@ export class ClickButtonComponent {
 
   constructor(private userService: UserService, private matchService: MatchService, private rankingsService: RankingsService) {
     this.statusString = STATUS_STRINGS[0];
+  }
+
+  ngOnInit() {
+    this.gameClosed.subscribe(v => {
+      if(v) this.closeGame();
+    })
   }
 
   public async buttonClick() {
@@ -55,7 +63,7 @@ export class ClickButtonComponent {
       }
       case 1: // if the user should end the match..
       {
-        this.matchService.closeMatch(this.matchId).subscribe(() => { // close the matcher
+        this.matchService.closeMatch(this.matchId).subscribe(() => { // close the match
           this.rankingsService.getUserRankings(this.userId).subscribe((data: IRankingsResult[]) => { // retrieves the rankings
             this.results.emit(data);
           })
@@ -63,5 +71,13 @@ export class ClickButtonComponent {
         break;
       }
     }
+  }
+
+  public async closeGame() {
+    this.matchService.closeMatch(this.matchId).subscribe(() => { // close the match
+      this.rankingsService.getUserRankings(this.userId).subscribe((data: IRankingsResult[]) => { // retrieves the rankings
+        this.results.emit(data);
+      })
+    });
   }
 }

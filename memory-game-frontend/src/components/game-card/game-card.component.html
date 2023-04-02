@@ -3,10 +3,10 @@
   <mat-card-subtitle *ngIf="countdownStarted && countdown > 0">
     Il gioco inizierà in... {{countdown}} secondi
   </mat-card-subtitle>
-  <mat-card-content>Per iniziare, inserisci il tuo username!</mat-card-content>
-  <mat-card-actions>
-    <input type="text" [(ngModel)]="this.username">
-    <app-click-button (results)="retrieveRankingsData($event)" (timer)="setTImer($event)" (countdownStarted)="setCountdown()" [username]="this.username"></app-click-button>
+  <mat-card-content *ngIf="(!gameStarted)">Per iniziare, inserisci il tuo username!</mat-card-content>
+  <mat-card-actions >
+    <input type="text" *ngIf="!gameStarted" [(ngModel)]="this.username">
+    <app-click-button (results)="retrieveRankingsData($event)" (timer)="setTImer($event)" (countdownStarted)="setCountdown()" [gameClosed]="closeGame" [username]="this.username"></app-click-button>
   </mat-card-actions>
 </mat-card>
 
