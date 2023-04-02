@@ -1,9 +1,12 @@
 <mat-card class="custom-card" *ngIf="rankings.length <= 0 && !timeFinished">
   <mat-card-header><b>Benvenuto su Memory: The Game!</b></mat-card-header>
+  <mat-card-subtitle *ngIf="countdownStarted && countdown > 0">
+    Il gioco inizierà in... {{countdown}} secondi
+  </mat-card-subtitle>
   <mat-card-content>Per iniziare, inserisci il tuo username!</mat-card-content>
   <mat-card-actions>
     <input type="text" [(ngModel)]="this.username">
-    <app-click-button (results)="retrieveRankingsData($event)" (timer)="setTImer($event)" [username]="this.username"></app-click-button>
+    <app-click-button (results)="retrieveRankingsData($event)" (timer)="setTImer($event)" (countdownStarted)="setCountdown()" [username]="this.username"></app-click-button>
   </mat-card-actions>
 </mat-card>
 
@@ -21,7 +24,7 @@
   </mat-card-actions>
 </mat-card>
 
-<mat-card class="custom-card" *ngIf="timeFinished">
+<mat-card class="custom-card" *ngIf="timeFinished && rankings.length <= 0">
   <mat-card-header><b>Tempo scaduto!!</b></mat-card-header>
   <mat-card-content>Ricarica la pagina per riprovare.</mat-card-content>
   <mat-card-actions></mat-card-actions>

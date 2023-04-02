@@ -5,9 +5,12 @@ import IRankingsResult from "../../interfaces/IRankingsResult";
 import {RankingsService} from "../../services/rankings.service";
 
 enum STATUS_STRINGS {
-  'Registrati!',
-  'Inizia match',
+  'Registrati e inizia!',
   'Concludi match'
+}
+
+function sleep(ms: number) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
 @Component({
@@ -22,6 +25,7 @@ export class ClickButtonComponent {
   @Output() timer = new EventEmitter<number>();
   private status: number = 0;
   public statusString: string;
+  @Output() countdownStarted = new EventEmitter<boolean>();
   private userId: string = '';
   private matchId: string = '';
 
@@ -31,29 +35,25 @@ export class ClickButtonComponent {
 
   public async buttonClick() {
     switch(this.status) {
-      case 0: // if the user should register..
+      case 0: // if the user should register and then start the game..
       {
         this.userService.createUser(this.username).subscribe((data: {_id: string}) => {
           this.userId = data._id;
 
-          this.status = 1;
-          this.statusString = STATUS_STRINGS[1];
+          this.countdownStarted.emit(true); // starts on the countdown
+
+          this.matchService.createMatch(this.userId).subscribe((data: {_id: string, user: string, closed: boolean, createdAt: string}) => {
+            this.matchId = data._id;
+
+            this.status = 1;
+            this.statusString = STATUS_STRINGS[1];
+
+            this.timer.emit(30); // starts the timer
+          });
         });
         break;
       }
-      case 1: // if the user should start the match..
-      {
-        this.matchService.createMatch(this.userId).subscribe((data: {_id: string, user: string, closed: boolean, createdAt: string}) => {
-          this.matchId = data._id;
-
-          this.status = 2;
-          this.statusString = STATUS_STRINGS[2];
-
-          this.timer.emit(10); // starts the timer
-        });
-        break;
-      }
-      case 2: // if the user should end the match..
+      case 1: // if the user should end the match..
       {
         this.matchService.closeMatch(this.matchId).subscribe(() => { // close the matcher
           this.rankingsService.getUserRankings(this.userId).subscribe((data: IRankingsResult[]) => { // retrieves the rankings
