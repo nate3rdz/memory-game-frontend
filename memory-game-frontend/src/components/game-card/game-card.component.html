@@ -1,8 +1,28 @@
-<mat-card class="custom-card">
+<mat-card class="custom-card" *ngIf="rankings.length <= 0 && !timeFinished">
   <mat-card-header><b>Benvenuto su Memory: The Game!</b></mat-card-header>
   <mat-card-content>Per iniziare, inserisci il tuo username!</mat-card-content>
   <mat-card-actions>
     <input type="text" [(ngModel)]="this.username">
-    <app-click-button [username]="this.username"></app-click-button>
+    <app-click-button (results)="retrieveRankingsData($event)" (timer)="setTImer($event)" [username]="this.username"></app-click-button>
   </mat-card-actions>
+</mat-card>
+
+<mat-card class="custom-card" *ngIf="rankings.length > 0">
+  <mat-card-header><b>Questa è la classifica:</b></mat-card-header>
+  <mat-card-content>
+    <li *ngFor="let rank of rankings; index as i;">
+      <br><b>Id</b>: {{rank._id}}
+      <br><b>Nickname</b>: {{rank.nickname}}
+      <br><b>Tempo migliore ottenuto</b>: {{rank.bestTiming}}
+      <br><b>Grado nella classifica</b>: {{rank.rank}}
+    </li>
+  </mat-card-content>
+  <mat-card-actions>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card class="custom-card" *ngIf="timeFinished">
+  <mat-card-header><b>Tempo scaduto!!</b></mat-card-header>
+  <mat-card-content>Ricarica la pagina per riprovare.</mat-card-content>
+  <mat-card-actions></mat-card-actions>
 </mat-card>

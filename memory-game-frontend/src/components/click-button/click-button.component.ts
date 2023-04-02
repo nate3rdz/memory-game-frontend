@@ -1,6 +1,8 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {UserService} from "../../services/user.service";
 import {MatchService} from "../../services/match.service";
+import IRankingsResult from "../../interfaces/IRankingsResult";
+import {RankingsService} from "../../services/rankings.service";
 
 enum STATUS_STRINGS {
   'Registrati!',
@@ -16,12 +18,14 @@ enum STATUS_STRINGS {
 export class ClickButtonComponent {
 
   @Input() username: string = '';
+  @Output() results = new EventEmitter<IRankingsResult[]>();
+  @Output() timer = new EventEmitter<number>();
   private status: number = 0;
   public statusString: string;
   private userId: string = '';
   private matchId: string = '';
 
-  constructor(private userService: UserService, private matchService: MatchService) {
+  constructor(private userService: UserService, private matchService: MatchService, private rankingsService: RankingsService) {
     this.statusString = STATUS_STRINGS[0];
   }
 
@@ -40,19 +44,22 @@ export class ClickButtonComponent {
       case 1: // if the user should start the match..
       {
         this.matchService.createMatch(this.userId).subscribe((data: {_id: string, user: string, closed: boolean, createdAt: string}) => {
-          console.log(data._id);
           this.matchId = data._id;
 
           this.status = 2;
           this.statusString = STATUS_STRINGS[2];
+
+          this.timer.emit(10); // starts the timer
         });
         break;
       }
       case 2: // if the user should end the match..
       {
-        this.matchService.closeMatch(this.matchId).subscribe(() => {
-          window.location.href = `http://localhost:4000/rankings/${this.userId}`;
-        })
+        this.matchService.closeMatch(this.matchId).subscribe(() => { // close the matcher
+          this.rankingsService.getUserRankings(this.userId).subscribe((data: IRankingsResult[]) => { // retrieves the rankings
+            this.results.emit(data);
+          })
+        });
         break;
       }
     }
